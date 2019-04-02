@@ -78,8 +78,12 @@ frec_fund = vector_frec(orden_max);
 
 %..................... CALCULO ERROR PORCENTUAL .........................
 
-%%% Frecuencia en Hz de la EDUCIA %%%
-val_exact = 440;                                     
+%%% Frecuencia ideal en Hz %%%
+val_exact = 440;
+% val_exact = 220;
+% val_exact = 110;
+% val_exact = 55;
+% val_exact = 27.5;
 
 %%% Error relativo porcentual de la frecuencia medida %%%
 error_relativo_porc = ERel(val_exact,frec_fund);     
