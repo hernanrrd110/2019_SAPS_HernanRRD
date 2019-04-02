@@ -19,7 +19,7 @@ fprintf('.....Procesamiento de seniales de audio.....\r\n');
 file_senial = strcat(pathname,filename);
 [vector_senial_estereo, frec_muestreo] = audioread(file_senial);
 
-fprintf('.........Track AUDIO Seleccionado %s\r\n',file_senial);
+fprintf('.........Track AUDIO Seleccionado......... \r\n %s\r\n',file_senial);
 
 %%%%El audio tiene dos canales, sacamos solo un canal
 vector_senial_monoL  = vector_senial_estereo(:,1);
@@ -39,7 +39,7 @@ FFT1  = fft(vector_senial_monoL, num_muestras) / num_muestras;
 Modulo1 = 2*abs(FFT1);                                     % Módulo de FFT
 %%%%Nos quedamos con las frecuencias positivas
 Modulo1 = Modulo1(1:floor(num_muestras/2));
-freq = frec_muestreo*linspace (0,1,floor(num_muestras/2));% vector frecuencias [Hz]
+freq = frec_muestreo/2*linspace(0,1,floor(num_muestras/2));% vector frecuencias [Hz]
 
 
 %%%%% Cálculo de Max %%%%%
@@ -70,8 +70,6 @@ close all;
 figure1 = figure ('Color',[1 1 1],'Name','Track Audio','NumberTitle','off');
 plot(vector_tiempo, vector_senial_monoL,'LineWidth',1);grid on;    
                             
-% axes1 = axes('Parent',figure1,'LineWidth',2,'FontSize',12,...
-%     'FontName','Arial'); %Formato para las leyendas de los ejes
 
 
 title('Sinusoidal','FontSize',11,'FontName','Arial')
