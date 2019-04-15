@@ -102,7 +102,7 @@ vector_filtrado = vector_filtrado.^2;
 %%%%Demodulacion
 vector_filtrado = filter(FiltroPasaBajo_6Hz,1,vector_filtrado);
 
-vector_filtrado = movmean(vector_filtrado,2000);
+% vector_filtrado = movmean(vector_filtrado,2000);
 
 %........................ CALCULO DE FFT FILTRADO .........................
 
@@ -116,7 +116,7 @@ freq_filtrado = frec_muestreo/2*linspace(0,1,floor(num_muestras/2));% vector fre
 figure3 = figure ('Color',[1 1 1],'Name','Track Audio','NumberTitle','off');
 plot(vector_tiempo, vector_filtrado,'LineWidth',1);grid on;    
 
-title('Señial','FontSize',11,'FontName','Arial')
+title('Senial','FontSize',11,'FontName','Arial')
 xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
 ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
