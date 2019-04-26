@@ -11,11 +11,11 @@ close all;
 %.....................GENERACION SENIALES .....................
  
 %%%% Parametros
-Tadq = 2; % Duracion
+Tadq = 10; % Duracion
 frec_muestreo = 48000;
 
 %%%% Moduladora
-F1 = 10;      % Frecuencia de la señal modulante
+F1 = 2;      % Frecuencia de la señal modulante
 F2 = 5;      % Frecuencia de la señal modulante
  
 
@@ -27,12 +27,12 @@ t = 0:1/frec_muestreo:Tadq-(1/frec_muestreo);
 freq = frec_muestreo/2*linspace(0,1,floor(N/2)); 
 
 %Seniales moduladoras
-Moduladora1 = 0.1*cos(2*pi*F1*t); 
-Moduladora2 = 0.5*cos(2*pi*F2*t);
-Moduladora = 1 + Moduladora1 + Moduladora2;
+Moduladora1 = cos(2*pi*F1*t); 
+Moduladora2 = cos(2*pi*F2*t);
+Moduladora = 1 + Moduladora1;
 
 %%%% Portadora
-F3 = 200; 
+F3 = 3500; 
 Portadora = cos(2*pi*F3*t);
 
 %%%% Senial en conjunto
@@ -69,6 +69,8 @@ xlabel('Frecuencia [Hz]','FontSize',11,'FontName','Arial')
 ylabel('Modulo','FontSize',11,'FontName','Arial')
 
 xlim([0 3000]);
+
+sound(Senial,frec_muestreo);
 
 
 

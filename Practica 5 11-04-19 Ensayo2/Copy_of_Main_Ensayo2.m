@@ -22,8 +22,6 @@ file_senial = strcat(pathname,filename);
 
 fprintf('.........Track AUDIO Seleccionado......... \r\n %s\r\n',filename);
 
-load('HanningSilbido.mat');
-load('FiltroPasaBajo_6Hz.mat');
 
 
 %%
@@ -53,16 +51,7 @@ freq = frec_muestreo/2*linspace(0,1,floor(num_muestras/2));% vector frecuencias 
 % orden_max es el indice donde encontro el maximo
 frec_fund = freq(orden_max);                                               
 
-% %.............................. FILTRADO...................................
-% 
-% load('Filtro_PB.mat')
-% vector_senial_sucia_filtrada = filter(Coeficientes_flitroPB,1,vector_senial_sucia);
-% 
-% %......................... FTT DEL SENIALFILTRADA .........................
-% 
-% FFT_filtrada  = fft((vector_senial_sucia_filtrada), num_muestras) / num_muestras;
-% Modulo_filtrada = 2*abs(FFT_filtrada);
-% Modulo_filtrada = Modulo_filtrada(1:floor(num_muestras/2)); %%%%floor = truncar
+
 
 %%
 % %.............................. GRAFICAS ...............................
@@ -89,21 +78,17 @@ frec_fund = freq(orden_max);
 %%
 %.............................. DETECCION ...............................
 
-close all;
-
-load('FiltroPasaBajo_6Hz.mat');
 load('Coef_Butter_Silbidos.mat');
+load('Coef_Butter_FiltroPasaBanda');
+load('Coef_Butter_FiltroRechazaBanda');
 
 %%%% Filtrado inicial Pasa Banda
-vector_filtrado = filter(Num,1,vector_senial);
-
+vector_filtrado = filtfilt(Numer,Denomer,vector_senial);
 
 %%%% Rectificación
 vector_filtrado = vector_filtrado.^2;
 
 %%%% Demodulacion
-% vector_filtrado = filter(FiltroPasaBajo_6Hz,1,vector_filtrado);
-
 vector_filtrado = filter(Numerador_Butter,Denominador_Butter,vector_filtrado);
 
 % vector_filtrado = movmean(vector_filtrado,2000);
@@ -121,100 +106,22 @@ freq_filtrado = frec_muestreo/2*linspace(0,1,floor(num_muestras/2));% vector fre
 duracion_temporal_minima = 0.100;
 duracion_temporal_maxima = 0.800;
 intervalo_silbido_tiempo = 1;
-limite_duracion=round(intervalo_silbido_tiempo*frec_muestreo);
-frames_duracion_minima = round(duracion_temporal_minima*frec_muestreo)+1;
-frames_duracion_maxima = round(duracion_temporal_maxima*frec_muestreo)+1;
 
-vector_comparado = vector_filtrado;
-umbral_alto = 0.006;
-umbral_bajo = 0.002;
-detectado = false;
-contador = 0;
-frame_detectado = 0;
+[vector_activos] = Sistema_Deteccion(vector_filtrado,frec_muestreo,...
+    duracion_temporal_minima,duracion_temporal_maxima,intervalo_silbido_tiempo);
 
-for i=1:length(vector_filtrado)
-    if (detectado == false)
-        if (vector_filtrado(i)>umbral_alto)
-            vector_comparado(i) = 0.1;
-            detectado = true;
-        else
-            vector_comparado(i) = 0;
-        end
-    else
-            if (vector_filtrado(i)<umbral_bajo)
-            vector_comparado(i) = 0;
-            detectado = false;
-            else
-            vector_comparado(i) = 0.1;
-            end
-    end
-end
+[vector_alarma] = Alarma(vector_activos,frec_muestreo);
 
-vector_silbidos = zeros(length(vector_comparado),1);
-detectado = false;
+% sound(vector_alarma,frec_muestreo);
 
-cuenta_alarmas = 0;
-cuenta_apagados = 0;
+vector_final1 = vector_senial + vector_alarma;
+vector_final = filter(Numer,Denomer,vector_final1);
 
-for j=1:length(vector_silbidos)
-    if(detectado == false)
-        if(vector_comparado(j) > 0)
-            detectado = true;
-            frame_detectado = j;
-        end
-    else
-        if(vector_comparado(j) == 0)
-            detectado = false;
-            if((contador >= frames_duracion_minima) && ...
-                    (contador < frames_duracion_maxima))
-                vector_silbidos(frame_detectado) = 1;
-            end
-                contador = 0;  
-            
-        else
-            contador = contador + 1;
-        end
-    end
-end
-                
-            
-            
-        
+vector_final = filter(Numer,Denomer,vector_final);
+vector_final = filtfilt(Num_RechazaB,Den_RechazaB,vector_final);
 
- 
-modo_alarma = false;
-contador = 0;
-frame_detectado = 0;
-contador_frames=0;
+sound(vector_final,frec_muestreo);
 
-
-for i=1:length(vector_silbidos)
-    
-    if(modo_alarma == false)
-        if(vector_silbidos(i) > 0)
-            modo_alarma = true;
-            cuenta_alarmas=cuenta_alarmas+1;
-        end
-    else
-        contador_frames=contador_frames+1;
-        
-        if(contador_frames > limite_duracion)
-            contador=0;
-        end
-   
-        if(contador == 3)
-            modo_alarma = false;
-            contador_frames=0;
-            contador = 0;
-            cuenta_apagados = cuenta_apagados +1 ;
-        else
-            if(vector_silbidos(i) > 0 )
-            contador = contador + 1;
-            contador_frames=0;
-            end
-        end
-    end
-end
 
 %................. GRAFICACION senial filtrada ....................
 figure3 = figure ('Color',[1 1 1],'Name','Track Audio','NumberTitle','off');
@@ -224,23 +131,26 @@ title('Senial','FontSize',11,'FontName','Arial')
 xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
 ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
-%................. GRAFICACION senial comparada ....................
-hold on;
-plot(vector_tiempo, vector_comparado,'LineWidth',1);grid on;    
-
-title('Senial','FontSize',11,'FontName','Arial')
+%................. GRAFICACION senial de entrada, alarma y combinada ....................
+figure4 = figure ('Color',[1 1 1],'Name','Señales Resultantes','NumberTitle','off');
+subplot(3,1,1);
+plot(vector_tiempo, vector_alarma,'LineWidth',1,'Color','g');grid on;    
+title('Senial de Alarma','FontSize',11,'FontName','Arial')
 xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
 ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
-%................. GRAFICACION senial silbidos ....................
-hold on;
-plot(vector_tiempo, vector_silbidos,'LineWidth',1);grid on;    
-
-title('Senial','FontSize',11,'FontName','Arial')
+subplot(3,1,2);
+plot(vector_tiempo, vector_senial,'LineWidth',1,'Color','r');grid on;    
+title('Senial de Silbidos','FontSize',11,'FontName','Arial')
 xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
 ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
 
+subplot(3,1,3);
+plot(vector_tiempo, vector_final1,'LineWidth',1,'Color','b');grid on;    
+title('Senial Resultante','FontSize',11,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
+ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
 % %................. GRAFICACION FFT senial filtrada  ....................
 % 
