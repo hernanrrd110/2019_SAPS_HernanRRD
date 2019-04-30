@@ -1,15 +1,21 @@
-function [vector_activos] = Sistema_Deteccion(vector_filtrado,frec_muestreo,duracion_temporal_minima,duracion_temporal_maxima,intervalo_silbido_tiempo)
+% Resumen: Etapa de comparacion de un vector filtrado para obtener la
+% alarma
+% Recibe; vector ya filtrado, frecuencia de muestreo, duracion maxima y 
+% minima de silbidos, intervalo de tiempo entre silbidos consecutivos
 
-limite_duracion=round(intervalo_silbido_tiempo*frec_muestreo);
-frames_duracion_minima = round(duracion_temporal_minima*frec_muestreo)+1;
-frames_duracion_maxima = round(duracion_temporal_maxima*frec_muestreo)+1;
+function [vector_activos] = Sistema_Deteccion(vector_filtrado,frec_muestreo,...
+    duracion_temporal_minima,duracion_temporal_maxima,intervalo_silbido_tiempo)
 
-vector_comparado =zeros(size(vector_filtrado));
+%................... COMPARACION
+%  Da alto cada vez que la senial pasa un primer umbral(alto) de deteccion y
+%  luego pasa a bajo una vez que pasó un segundo umbral (bajo). Permite ver
+%  la duracion de cada silbido
+
+vector_comparado = zeros(size(vector_filtrado));
 umbral_alto = 0.006;
 umbral_bajo = 0.002;
-detectado = false;
-contador = 0;
-frame_detectado = 0;
+detectado = false; % Para cambiar el umbral adaptativo
+
 
 for i=1:length(vector_filtrado)
     if (detectado == false)
@@ -29,10 +35,19 @@ for i=1:length(vector_filtrado)
     end
 end
 
+%................... VALIDACION DE SILBIDO
+% Se valida si los silbidos medidos que pasaron las anteriores condiciones
+% cumplen con condiciones de tiempo dadas
+
 vector_silbidos = zeros(length(vector_comparado),1);
-detectado = false;
 
+% transformamos los tiempos en frames para poder trabajarlos
+frames_duracion_minima = round(duracion_temporal_minima*frec_muestreo)+1;
+frames_duracion_maxima = round(duracion_temporal_maxima*frec_muestreo)+1;
 
+detectado = false; % Por si esta en alto o en bajo
+contador = 0; % Cuenta el tiempo en alto
+frame_detectado = 0; % Memoriza el lugar donde empieza el silbido
 
 for j=1:length(vector_silbidos)
     if(detectado == false)
@@ -54,9 +69,22 @@ for j=1:length(vector_silbidos)
         end
     end
 end           
- 
-modo_alarma = false;
-contador = 0;
+
+%................... ACTIVACION DE LA ALARMA
+% Indica en que tiempos la alarma debe activarse. Para la activacion de la
+% alarma, el primer silbido detectado determina el incio de la alarma.
+% Para desactivarla, se tiene que determinar silbidos consecutivos. Se
+% establecio que un silbido es consecutivo si no pasan mas del limite
+% establecido en "limite_duracion"
+
+% transformamos los tiempos en frames para poder trabajarlos
+limite_duracion=round(intervalo_silbido_tiempo*frec_muestreo);
+
+modo_alarma = false; % Si esta la alarma prendida o no
+contador = 0;% cuenta los silbidos consecutivos
+
+% contador_frames cuenta los frames desde que la alarma esta activa, para
+% determinar si cumple el limite o no
 contador_frames=0;
 
 vector_activos = zeros(length(vector_comparado),1);
