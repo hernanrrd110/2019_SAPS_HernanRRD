@@ -48,11 +48,11 @@ load('Coef_Butter_FiltroRechazaBanda.mat');
 % . . . Orden 6
 % . . . Archivo: Butterworth-FiltroPasaBanda.fda/Coef_Butter_FiltroPasaBanda
 
-vector_filtrado = filtfilt(Num_PasaBanda,Den_PasaBanda,vector_senial);
+vector_filtrado1 = filtfilt(Num_PasaBanda,Den_PasaBanda,vector_senial);
 
 %%%% Rectificación
 % Permite obtener separar la modulante de la portadora
-vector_filtrado = vector_filtrado.^2;
+vector_filtrado2 = vector_filtrado1.^2;
 
 %%%% Demodulacion
 % Extraemos la modulante de la senial del silbido
@@ -61,7 +61,7 @@ vector_filtrado = vector_filtrado.^2;
 % . . . f corte inferior = 6 Hz
 % . . . Orden 3
 % . . . Archivo: Butterworth-Silbidos.fda/Coef_Butter_FiltroPasaBajos.mat
-vector_filtrado = filter(Num_PasaBajos,Den_PasaBajos,vector_filtrado);
+vector_filtrado3 = filter(Num_PasaBajos,Den_PasaBajos,vector_filtrado2);
 
 %%% Comparacion
 % Duracion minima de silbido, Duracion maxima de silbido, intervalo de
@@ -71,7 +71,7 @@ duracion_temporal_minima = 0.100; %[s]
 duracion_temporal_maxima = 0.800; %[s]
 intervalo_silbido_tiempo = 1; %[s]
 
-[vector_activos] = Sistema_Deteccion(vector_filtrado,frec_muestreo,...
+[vector_activos] = Sistema_Deteccion(vector_filtrado3,frec_muestreo,...
     duracion_temporal_minima,duracion_temporal_maxima,intervalo_silbido_tiempo);
 
 [vector_alarma] = Alarma(vector_activos,frec_muestreo);
@@ -87,9 +87,7 @@ vector_final = vector_senial + vector_alarma;
 % Una vez tenemos la alarma, probamos el filtro Rechaza Banda para lograr
 % quitarnos este sonido.
 
-vector_final = filter(Num_RechazaBanda,Den_RechazaBanda,vector_final);
-
-% sound(vector_final,frec_muestreo);
+vector_final_filtrada = filtfilt(Num_RechazaBanda,Den_RechazaBanda,vector_final);
 
 %%
 %......................... CALCULO DE FFT AUDIO ..........................
@@ -105,7 +103,7 @@ freq = frec_muestreo/2*linspace(0,1,floor(num_muestras/2));
 
 %........................ CALCULO DE FFT FILTRADO .........................
 
-Modulo_filtrado = 2*abs(fft(vector_filtrado, num_muestras) / num_muestras);
+Modulo_filtrado = 2*abs(fft(vector_filtrado3, num_muestras) / num_muestras);
 
 %%%% Nos quedamos con las frecuencias positivas
 Modulo_filtrado = Modulo_filtrado(1:floor(num_muestras/2));
@@ -126,71 +124,105 @@ frec_fund = freq(orden_max);
 
 %................. GRAFICACION senial
 tamanio_titulo = 22;
-tamanio_leyenda = 18;
+tamanio_ejes = 18;
 
 figure1 = figure ('Color',[1 1 1],'Name','Señal Temporal Orginal','NumberTitle','off');
 plot(vector_tiempo, vector_senial,'LineWidth',1);grid on;    
 
-title('Señal temporal de Audio Original','FontSize',11,'FontName','Arial')
-xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
-ylabel('Amplitud','FontSize',11,'FontName','Arial')
+title('Señal temporal de Audio Original','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
 
 %................. GRAFICACION FFT senial
 figure2 = figure ('Color',[1 1 1],'Name','FFT Audio Orginal','NumberTitle','off');
 stem(freq, Modulo, 'b','LineWidth',1);grid on;
 
-title('Espectro de Señal de Audio Original')
-xlabel('Frecuencia [Hz]','FontSize',11,'FontName','Arial')
-ylabel('Modulo','FontSize',11,'FontName','Arial')
+title('Espectro de Señal de Audio Original','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Frecuencia [Hz]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Modulo','FontSize',tamanio_ejes,'FontName','Arial')
 
 %................. GRAFICACION senial filtrada
 
 figure3 = figure ('Color',[1 1 1],'Name','Señal Filtrada','NumberTitle','off');
 subplot(2,1,1);
-plot(vector_tiempo, vector_filtrado,'LineWidth',1);grid on;    
+plot(vector_tiempo, vector_filtrado3,'LineWidth',1);grid on;    
 
-title('Señal con todos los filtrados','FontSize',11,'FontName','Arial')
-xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
-ylabel('Amplitud','FontSize',11,'FontName','Arial')
+title('Señal con todos los filtrados','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
 
 %................. GRAFICACION FFT senial filtrada  ....................
 
 subplot(2,1,2);
 stem(freq_filtrado, Modulo_filtrado, 'b','LineWidth',1);grid on;
 
-title('Espectro')
-xlabel('Frecuencia [Hz]','FontSize',11,'FontName','Arial')
-ylabel('Modulo filtrado','FontSize',11,'FontName','Arial')
+title('Espectro Señal Filtrada','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Frecuencia [Hz]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Modulo filtrado','FontSize',tamanio_ejes,'FontName','Arial')
 
 %............ GRAFICACION senial de entrada, alarma y combinada
 
 figure4 = figure ('Color',[1 1 1],'Name','Señales Resultantes','NumberTitle','off');
-subplot(3,1,1);
-plot(vector_tiempo, vector_alarma,'LineWidth',1,'Color','g');grid on;    
-title('Señal de Alarma','FontSize',22,'FontName','Arial')
-xlabel('Tiempo [seg]','FontSize',18,'FontName','Arial')
-ylabel('Amplitud','FontSize',18,'FontName','Arial')
+subplot(4,1,1);
+plot(vector_tiempo, vector_alarma,'LineWidth',1,'Color','g');grid on;
 
-subplot(3,1,2);
-plot(vector_tiempo, vector_senial,'LineWidth',1,'Color','r');grid on;    
-title('Señal Original','FontSize',22,'FontName','Arial')
-xlabel('Tiempo [seg]','FontSize',18,'FontName','Arial')
-ylabel('Amplitud','FontSize',18,'FontName','Arial')
+title('Señal de Alarma','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
 
-subplot(3,1,3);
-plot(vector_tiempo, vector_final,'LineWidth',1,'Color','b');grid on;    
-title('Señal Original + Alarma','FontSize',22,'FontName','Arial')
-xlabel('Tiempo [seg]','FontSize',18,'FontName','Arial')
-ylabel('Amplitud','FontSize',18,'FontName','Arial')
+subplot(4,1,2);
+plot(vector_tiempo, vector_senial,'LineWidth',1,'Color','r');grid on;
 
-% %............ GRAFICACION alarma solomente
-% figure5 = figure ('Color',[1 1 1],'Name','Señal Alarma','NumberTitle','off');
-% plot(vector_tiempo, vector_alarma,'LineWidth',1,'Color','g');grid on;    
-% title('Senial de Alarma','FontSize',22,'FontName','Arial')
+title('Señal Original','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+
+subplot(4,1,3);
+plot(vector_tiempo, vector_final,'LineWidth',1,'Color','b');grid on;  
+
+title('Señal Original + Alarma','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+
+subplot(4,1,4);
+plot(vector_tiempo, vector_final_filtrada,'LineWidth',1,'Color','b');grid on;  
+
+title('Señal Original + Alarma con filtro','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+
+
+
+% %...................... Graficacion
+% 
+% figure ('Color',[1 1 1],'Name','Señales','NumberTitle','off');
+% subplot(3,1,1);
+% plot(vector_tiempo, vector_filtrado1,'LineWidth',1,'Color','g');grid on;
+% 
+% title('Primer Filtro','FontSize',tamanio_titulo,'FontName','Arial')
+% xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+% ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+% 
+% subplot(3,1,2);
+% plot(vector_tiempo, vector_filtrado2,'LineWidth',1,'Color','r');grid on;
+% 
+% title('Segundo Filtro','FontSize',tamanio_titulo,'FontName','Arial')
+% xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+% ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+% 
+% subplot(3,1,3);
+% plot(vector_tiempo, vector_filtrado3,'LineWidth',1,'Color','b');grid on;  
+% 
+% title('Tercer Filtro','FontSize',tamanio_titulo,'FontName','Arial')
+% xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+% ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+% 
+% ............ GRAFICACION Vector Activos
+% figure6 = figure ('Color',[1 1 1],'Name','Señal de activacion de Alarma','NumberTitle','off');
+% plot(vector_tiempo, vector_activos,'LineWidth',1,'Color','g');grid on;    
+% title('Señal de Activacion','FontSize',tamanio_titulo,'FontName','Arial')
 % xlabel('Tiempo [seg]','FontSize',18,'FontName','Arial')
 % ylabel('Amplitud','FontSize',18,'FontName','Arial')
-
-
 
 
 

@@ -117,33 +117,31 @@ for i=1:length(vector_silbidos)
     end
 end
 
-% %...................... Graficacion
-% num_muestras = length(vector_filtrado);
-% vector_tiempo = 0:1/frec_muestreo:(num_muestras-1)/frec_muestreo;
-% tamanio_titulo = 22;
-% tamanio_ejes  = 18;
-% 
-% figure ('Color',[1 1 1],'Name','Señales','NumberTitle','off');
-% subplot(3,1,1);
-% plot(vector_tiempo, vector_comparado,'LineWidth',1,'Color','g');grid on;
-% 
-% title('Señal Comparada','FontSize',tamanio_titulo,'FontName','Arial')
-% xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
-% ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
-% 
-% subplot(3,1,2);
-% plot(vector_tiempo, vector_silbidos,'LineWidth',1,'Color','r');grid on;
-% 
-% title('Señal de Silbidos','FontSize',tamanio_titulo,'FontName','Arial')
-% xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
-% ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
-% 
-% subplot(3,1,3);
-% plot(vector_tiempo, vector_activos,'LineWidth',1,'Color','b');grid on;  
-% 
-% title('Señal de activacion','FontSize',tamanio_titulo,'FontName','Arial')
-% xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
-% ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+%...................... Graf
+num_muestras = length(vector_filtrado);
+vector_tiempo = 0:1/frec_muestreo:(num_muestras-1)/frec_muestreo;
+
+figure4 = figure ('Color',[1 1 1],'Name','Señales Resultantes','NumberTitle','off');
+subplot(4,1,1);
+plot(vector_tiempo, vector_alarma,'LineWidth',1,'Color','g');grid on;
+
+title('Señal de Alarma','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+
+subplot(4,1,2);
+plot(vector_tiempo, vector_senial,'LineWidth',1,'Color','r');grid on;
+
+title('Señal Original','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
+
+subplot(4,1,3);
+plot(vector_tiempo, vector_final,'LineWidth',1,'Color','b');grid on;  
+
+title('Señal Original + Alarma','FontSize',tamanio_titulo,'FontName','Arial')
+xlabel('Tiempo [seg]','FontSize',tamanio_ejes,'FontName','Arial')
+ylabel('Amplitud','FontSize',tamanio_ejes,'FontName','Arial')
 
 
         
