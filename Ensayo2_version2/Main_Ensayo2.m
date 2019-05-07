@@ -68,9 +68,9 @@ vector_filtrado3 = filter(Num_PasaBajos,Den_PasaBajos,vector_filtrado2);
 % Duracion minima de silbido, Duracion maxima de silbido, intervalo de
 % tiempo entre silbidos para tomarlo que uno es consecutivo del otro
 
-duracion_temporal_minima = 0.050; %[s]
+duracion_temporal_minima = 0.100; %[s]
 duracion_temporal_maxima = 0.800; %[s]
-intervalo_silbido_tiempo = 1; %[s]
+intervalo_silbido_tiempo = 0.8; %[s]
 
 [vector_activos] = Sistema_Deteccion(vector_filtrado3,frec_muestreo,...
     duracion_temporal_minima,duracion_temporal_maxima,intervalo_silbido_tiempo);
