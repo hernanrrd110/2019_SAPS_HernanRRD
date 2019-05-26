@@ -58,7 +58,7 @@ end
 Hs_desn = minreal(N_desn/D_desn)
 
 
-%% ..................... Visualizacion de Polos ..........................
+%%
 close all;
 [P_desn,Z_desn]= pzmap(Hs_desn);
 P_desn;
@@ -76,10 +76,9 @@ L_Pass2=tf(1,P2);
 
 L_Passtotal = L_Pass1*L_Pass2;
 
-%% ....................... Diseño del Pasabajos ...........................
+%% ................. Diseño del Pasabajos
 
-% ---- Coeficientes del Polinomio del Denominador de Sallen-Key con
-% ---- ganancia unitaria
+% ----´Coeficientes del Polinomio del Denominador de Sallen-Key
 %%%% Seccion 1 
 a2 = P1(1);
 a1 = P1(2);
@@ -94,13 +93,8 @@ b0 = P2(3);
 
 L_Pass2
 
-% Se realizaron las siguientes simplieficaciones. Las secciones de
-% Pasabajos tendran ganancia unitaria, y se llevara el resto de la ganancia
-% al pasa altos digital. Tomamos a las resistencias como multiplos, como
-% tambien los capacitores.
 
 % Celda 1
-
 C_1 = 1*10^(-11);
 
 m_1 = 2;
@@ -128,10 +122,8 @@ n_2 = b2/(m_2*R_2*R_2*C_2*C_2);
 C2_2 = C_2*n; %Tomamos 82n
 
 
-
 %% ........................... Graficacion ................................
-
-% ---------------------- Graficacion Bode PasaBanda ----------------------
+% ---- Graficacion Bode PasaBanda
 close all;
 figure('Color',[1 1 1],'Name','Bode H(jw) desnormalizada','NumberTitle','off');
 
@@ -139,19 +131,19 @@ N = 2000;
 W = logspace(2,6,N);
 Respuesta_Freq_PasaBanda = freqs(Hs_desn.Numerator{1},Hs_desn.Denominator{1},W);
 Maginitud_Pasabanda = 20*log10(abs(Respuesta_Freq_PasaBanda));
-
-semilogx(W,Maginitud_Pasabanda);grid on;
 title('H(jw) desnormalizada Pasabanda')
 xlabel('Frecuencia angular w [rad/s]');
 ylabel('Magnitud H(jw) [dB]');
+semilogx(W,Maginitud_Pasabanda);grid on;
 
-% ------------------------- Graficacion Polos ----------------------------
+% ----- Graficacion Polos
 
-figure('Color',[1 1 1],'Name','Polos y Ceros de H(s)','NumberTitle','off');
+figure('Color',[1 1 1],'Name','Polos de H(s)','NumberTitle','off');
 pzmap(Hs_desn)
-title('Polos y Ceros de H(s)')
+title('Polos de H(s)')
 
-% ------------ Graficacion Bode Secciones de forma analitica -------------
+% ---- Graficacion Bode Secciones de forma analitica
+
 figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
 
 % Primer Seccion
@@ -176,32 +168,12 @@ title('H(jw) de Seccion 1, 2 y total')
 xlabel('Frecuencia angular w [rad/s]');
 ylabel('Magnitud H(jw) [dB]');
 
-% ---------- Graficacion Bode LTSpice y  Pasabajos Analitico -------------
+% ---- Graficacion Bode LTSpice, Pasabajos Analitico e Implementado
 
 figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
 
 % LTSpice
-[freq,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
-
-freq = freq*2*pi;
-semilogx(freq,dB,'r');
-hold on;
-grid on;
-
-% Pasabajos Analitico
-semilogx(W,Maginitud_L_Passtotal,'g');grid on;
-
-legend('PasaBajos LTSpice','PasaBajos analitico');
-title('Función H(jw) Analítica, Simulación')
-xlabel('Frecuencia angular w [rad/s]');
-ylabel('Magnitud H(jw) [dB]');
-
-% ----- Graficacion Bode LTSpice, Pasabajos Analitico e Implementado -----
-
-figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
-
-% LTSpice
-[freq,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
+[freq,dB,deg] = import_ac_LTSpice('LTSpice_Cell3.txt');
 
 freq = freq*2*pi;
 semilogx(freq,dB,'r');
