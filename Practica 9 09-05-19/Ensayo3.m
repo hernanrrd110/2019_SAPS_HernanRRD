@@ -61,7 +61,7 @@ Hs_desn = minreal(N_desn/D_desn)
 %% ..................... Visualizacion de Polos ..........................
 close all;
 [P_desn,Z_desn]= pzmap(Hs_desn);
-P_desn;
+P_desn
 % Se seleccionaros los polos 1y2, y 5y6
 
 % Polinomio de orden 2 con polos 1 y 2 con ganancia 1
@@ -111,7 +111,7 @@ R2_1= m_1*R_1; %Da 300K
 
 n_1 = a2/(m_1*R_1*R_1*C_1*C_1);
 
-C2_1 = C_1*n; %Nos da 6044p, tomamos 5600p
+C2_1 = C_1*n_1; %Nos da 6044p, tomamos 5600p
 
 % Celda 2
 
@@ -119,13 +119,13 @@ C_2 = 1*10^(-9);
 
 m_2 = 2;
 
-R_2 = b1/((m_2+1)*C_2);  %Tomamos 9.1K
+R_2 = b1/((m_2+1)*C_2);  % Tomamos 9.1K
 
 R2_2 = m_2 * R_2; %Daria 18.2 K, tomamos 18K
 
 n_2 = b2/(m_2*R_2*R_2*C_2*C_2);
 
-C2_2 = C_2*n; %Tomamos 82n
+C2_2 = C_2*n_2; %Tomamos 82n
 
 
 
