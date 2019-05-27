@@ -6,7 +6,7 @@
 
 %%
 clear all; close all; clc;
- % Hacemo chevy;
+% Hacemo chevy;
 % El numero de bits de resolucion que tiene el conversor AD
 numero_bits  = 10;
 
@@ -33,7 +33,6 @@ w0 = sqrt(w1*w2); % Frecuencia central de desnormalizacion de Pasabanda
 %%% Funcion de transferencia en s normalizada de Chevyshev
 
 [Num,Den] = zp2tf(z,p,k);
-
 
 % tomamos a s como funcion de transferencia
 s = tf('s');
@@ -138,11 +137,12 @@ figure('Color',[1 1 1],'Name','Bode H(jw) desnormalizada','NumberTitle','off');
 N = 2000;
 W = logspace(2,6,N);
 Respuesta_Freq_PasaBanda = freqs(Hs_desn.Numerator{1},Hs_desn.Denominator{1},W);
-Maginitud_Pasabanda = 20*log10(abs(Respuesta_Freq_PasaBanda));
+Magnitud_Pasabanda = 20*log10(abs(Respuesta_Freq_PasaBanda));
+freq = W/(2*pi);
 
-semilogx(W,Maginitud_Pasabanda);grid on;
+semilogx(freq,Magnitud_Pasabanda);grid on;
 title('H(jw) desnormalizada Pasabanda')
-xlabel('Frecuencia angular w [rad/s]');
+xlabel('Frecuencia f [Hz]');
 ylabel('Magnitud H(jw) [dB]');
 
 % ------------------------- Graficacion Polos ----------------------------
@@ -158,22 +158,22 @@ figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
 Respuesta_L_Pass1 = freqs(L_Pass1.Numerator{1},L_Pass1.Denominator{1},W);
 Maginitud_L_Pass1 = 20*log10(abs(Respuesta_L_Pass1));
 
-semilogx(W,Maginitud_L_Pass1,'r');grid on; hold on;
+semilogx(freq,Maginitud_L_Pass1,'r');grid on; hold on;
 
 % Segunda Seccion
 Respuesta_L_Pass2 = freqs(L_Pass2.Numerator{1},L_Pass2.Denominator{1},W);
-Maginitud_L_Pass2 = 20*log10(abs(Respuesta_L_Pass2));
+Magnitud_L_Pass2 = 20*log10(abs(Respuesta_L_Pass2));
 
-semilogx(W,Maginitud_L_Pass2,'g');grid on; hold on;
+semilogx(freq,Magnitud_L_Pass2,'g');grid on; hold on;
 
 % Tercera Seccion
 Respuesta_L_Passtotal = freqs(L_Passtotal.Numerator{1},L_Passtotal.Denominator{1},W);
-Maginitud_L_Passtotal = 20*log10(abs(Respuesta_L_Passtotal));
+Magnitud_L_Passtotal = 20*log10(abs(Respuesta_L_Passtotal));
 
-semilogx(W,Maginitud_L_Passtotal,'b');grid on; 
+semilogx(freq,Magnitud_L_Passtotal,'b');grid on; 
 legend('PasaBajos 1','PasaBajos 2','PasaBajos Total');
 title('H(jw) de Seccion 1, 2 y total')
-xlabel('Frecuencia angular w [rad/s]');
+xlabel('Frecuencia f [Hz]');
 ylabel('Magnitud H(jw) [dB]');
 
 % ---------- Graficacion Bode LTSpice y  Pasabajos Analitico -------------
@@ -181,19 +181,19 @@ ylabel('Magnitud H(jw) [dB]');
 figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
 
 % LTSpice
-[freq,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
+[freqLTSpice,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
 
-freq = freq*2*pi;
-semilogx(freq,dB,'r');
+% freq = freq*2*pi;
+semilogx(freqLTSpice,dB,'r');
 hold on;
 grid on;
 
 % Pasabajos Analitico
-semilogx(W,Maginitud_L_Passtotal,'g');grid on;
+semilogx(freq,Magnitud_L_Passtotal,'g');grid on;
 
 legend('PasaBajos LTSpice','PasaBajos analitico');
 title('Función H(jw) Analítica, Simulación')
-xlabel('Frecuencia angular w [rad/s]');
+xlabel('Frecuencia f [Hz]');
 ylabel('Magnitud H(jw) [dB]');
 
 % ----- Graficacion Bode LTSpice, Pasabajos Analitico e Implementado -----
@@ -201,25 +201,24 @@ ylabel('Magnitud H(jw) [dB]');
 figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
 
 % LTSpice
-[freq,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
+[freqLTSpice,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
 
-freq = freq*2*pi;
-semilogx(freq,dB,'r');
+% freq = freq*2*pi;
+semilogx(freqLTSpice,dB,'r');
 hold on;
 grid on;
 
 % Pasabajos Analitico
-semilogx(W,Maginitud_L_Passtotal,'g');grid on;
+semilogx(freq,Magnitud_L_Passtotal,'g');grid on;
 
 % Pasabajos Implementado
 
 load('Datos_Implementacion.mat');
-Frecuencias_Implementado = Frecuencias_Implementado*2*pi;
 semilogx(Frecuencias_Implementado,GananciadB_Implementado,'b');grid on;
 
 legend('PasaBajos LTSpice','PasaBajos analitico', 'PasaBajos Implementado');
 title('Función H(jw) Analítica, Simulación e Implementación')
-xlabel('Frecuencia angular w [rad/s]');
+xlabel('Frecuencia f [Hz]');
 ylabel('Magnitud H(jw) [dB]');
 
 
