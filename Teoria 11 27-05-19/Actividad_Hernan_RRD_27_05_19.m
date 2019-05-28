@@ -19,7 +19,9 @@ fprintf('.....Procesamiento de seniales de audio.....\r\n');
 % [filename,pathname,~] = uigetfile('*.wav','Archivo de audio');
 % file_senial = strcat(pathname,filename);
 
-file_senial = 'C:\Repositorio GitHub\2019_SAPS_HernanRRD\Teoria 11 27-05-19\3_silbidos_1_5kHz_alarma_audacity.wav';
+% file_senial = 'C:\Repositorio GitHub\2019_SAPS_HernanRRD\Teoria 11 27-05-19\3_silbidos_1_5kHz_alarma_audacity.wav';
+file_senial = 'D:\Repositorio GitHub\2019_SAPS_HernanRRD\Teoria 11 27-05-19\3_silbidos_1_5kHz_alarma_audacity.wav';
+
 [vector_senial_estereo, frec_muestreo] = audioread(file_senial);
 
 fprintf('.........Track AUDIO Seleccionado......... \r\n %s\r\n',file_senial);
@@ -27,8 +29,6 @@ fprintf('.........Track AUDIO Seleccionado......... \r\n %s\r\n',file_senial);
 %%%% El audio tiene dos canales, sacamos solo un canal
 vector_senial  = vector_senial_estereo(:,1);
 
-
-%%
 %..................... ACONDICIONAMIENTO DE LA SENIAL .....................
 
 num_muestras = length(vector_senial);
@@ -51,15 +51,20 @@ freq = frec_muestreo/2*linspace(0,1,floor(num_muestras/2));% vector frecuencias 
 
 %% .............................. FILTRADO...................................
 
-load('FiltroFIR.mat')
-load('FiltroIIR.mat')
-load('FiltroIIR1K5')
+%%% Filtros Pasabajos solamente filtran la componente de 7K de la Alarma
+% load('FiltroFIR.mat')
+% load('FiltroIIR.mat')
+% 
+% vector_filtradaFIR = filter(NumeradorFIR,1,vector_senial);
+% vector_filtradaIIR = filter(NumeradorIIR,DenominadorIIR,vector_senial);
 
-vector_filtradaFIR = filter(NumeradorFIR,1,vector_senial);
-vector_filtradaIIR = filter(NumeradorIIR,DenominadorIIR,vector_senial);
-vector_filtrada1K5 = filter(NumIIR1K5,DenIIR1K5,vector_senial);
-
+load('FiltroFIRPasaBanda.mat')
+load('FiltroIIRPasaBanda.mat')
+vector_filtradaFIR = filter(NumFIRPasaBanda,1,vector_senial);
+vector_filtradaIIR = filter(NumIIRPasaBanda,DenIIRPasaBanda,vector_senial);
+fvtool(NumIIRPasaBanda,DenIIRPasaBanda)
 %......................... FTT DEL SENIAL FILTRADA .........................
+
 
 FFT_filtradaFIR  = fft((vector_filtradaFIR), num_muestras) / num_muestras;
 Modulo_filtradaFIR = 2*abs(FFT_filtradaFIR);
@@ -69,68 +74,75 @@ FFT_filtradaIIR  = fft((vector_filtradaIIR), num_muestras) / num_muestras;
 Modulo_filtradaIIR = 2*abs(FFT_filtradaIIR);
 Modulo_filtradaIIR = Modulo_filtradaIIR(1:floor(num_muestras/2));
 
-FFT_filtrada1K5  = fft((vector_filtrada1K5), num_muestras) / num_muestras;
-Modulo_filtrada1K5 = 2*abs(FFT_filtrada1K5);
-Modulo_filtrada1K5 = Modulo_filtrada1K5(1:floor(num_muestras/2));
+% ------- Respuestas al Impulso
+
+delta = zeros(1000,1);
+delta(1) = 1;
+h1 = filter(NumFIRPasaBanda,1,delta);
+h2 = filter(NumIIRPasaBanda,DenIIRPasaBanda,delta);
+plot(h1), hold on; plot(h2);
 
 %% .............................. GRAFICAS ...............................
 close all;
 
 figure ('Name','Track Audio','NumberTitle','off');
+subplot(2,1,1)
 plot(vector_tiempo, vector_senial,'LineWidth',1);grid on;    
 
-title('Sinusoidal','FontSize',11,'FontName','Arial')
+title('Track de Audio Sin Filtrar','FontSize',11,'FontName','Arial')
 xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
 ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
 %................... GRAFICACION FFT senial cruda .........................
 
-figure('Color',[1 1 1],'Name','Track Audio','NumberTitle','off');
+subplot(2,1,2)
 stem(freq, Modulo1, 'b','LineWidth',1);grid on;
 
-title('Espectro')
+title('Espectro sin filtrado')
 xlabel('Frecuencia [Hz]','FontSize',11,'FontName','Arial')
 ylabel('Modulo1','FontSize',11,'FontName','Arial')
 
 %................. GRAFICACION senial filtrada FIR .......................
 
-figure('Color',[1 1 1],'Name','Track Audio filtrada','NumberTitle','off');
+figure('Color',[1 1 1],'NumberTitle','off');
+subplot(2,1,1)
 plot(vector_tiempo, (vector_filtradaFIR), 'r','LineWidth',1);grid on;
 
-title('Sinusoidal','FontSize',11,'FontName','Arial')
+title('Senial de audio con Filtrado FIR','FontSize',11,'FontName','Arial')
 xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
+ylabel('Amplitud','FontSize',11,'FontName','Arial')
+
+subplot(2,1,2)
+stem(freq, Modulo_filtradaIIR, 'r','LineWidth',1);grid on;
+
+title('FFT Filtrado FIR','FontSize',11,'FontName','Arial')
+xlabel('Frecuencia f [Hz]','FontSize',11,'FontName','Arial')
 ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
 %................. GRAFICACION senial filtrada IIR .......................
 
 figure('Color',[1 1 1],'Name','Track Audio filtrada','NumberTitle','off');
+subplot(2,1,1)
 plot(vector_tiempo, (vector_filtradaIIR), 'r','LineWidth',1);grid on;
 
-title('Sinusoidal','FontSize',11,'FontName','Arial')
+title('Senial de audio con Filtrado IIR','FontSize',11,'FontName','Arial')
 xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
 ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
-figure('Color',[1 1 1],'Name','Track Audio filtrada','NumberTitle','off');
-plot(freq, Modulo_filtradaIIR, 'r','LineWidth',1);grid on;
+subplot(2,1,2)
+stem(freq, Modulo_filtradaIIR, 'r','LineWidth',1);grid on;
 
-title('Sinusoidal','FontSize',11,'FontName','Arial')
-xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
+title('FFT Filtrado IIR','FontSize',11,'FontName','Arial')
+xlabel('Frecuencia f [Hz]','FontSize',11,'FontName','Arial')
 ylabel('Amplitud','FontSize',11,'FontName','Arial')
 
-figure('Color',[1 1 1],'Name','Track Audio filtrada','NumberTitle','off');
-plot(freq, Modulo_filtrada1K5, 'r','LineWidth',1);grid on;
-
-title('Sinusoidal','FontSize',11,'FontName','Arial')
-xlabel('Tiempo [seg]','FontSize',11,'FontName','Arial')
-ylabel('Amplitud','FontSize',11,'FontName','Arial')
-
-sound(vector_filtrada1K5,frec_muestreo);
+spectrogram(vector_senial,128,120,128,frec_muestreo,'yaxis'); figure;
+spectrogram(vector_senial,256,250,256,frec_muestreo,'yaxis'); figure;
+spectrogram(vector_senial,512,510,512,frec_muestreo,'yaxis')
 
 
 
-
-
-
+% sound(10*vector_filtradaIIR,frec_muestreo)
 
 
 
