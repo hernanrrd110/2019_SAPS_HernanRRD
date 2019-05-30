@@ -1,0 +1,542 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Ensayo3</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-05-30"><meta name="DC.source" content="Ensayo3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">............................ ENSAYO 3 ..................................</a></li><li><a href="#3">.................... PARAMETROS DEL FILTRO CHEVYSHEV ...................</a></li><li><a href="#4">Funcion de transferencia en s normalizada de Chevyshev</a></li><li><a href="#5">..................... Visualizacion de Polos ..........................</a></li><li><a href="#6">....................... Dise&ntilde;o del Pasabajos ...........................</a></li><li><a href="#7">........................... Graficacion ................................</a></li></ul></div><h2 id="1">............................ ENSAYO 3 ..................................</h2><p>Autores: Dragan Valeria, Hamnstrom Luis, Rodriguez Ruiz Diaz Hernan SAPS: 1er Cuatrimestre 2019 09-05-19</p><pre class="codeinput"><span class="comment">%--------------------------------------------------------------------------</span>
+</pre><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>; clc;
+<span class="comment">% Hacemo chevy;</span>
+<span class="comment">% El numero de bits de resolucion que tiene el conversor AD</span>
+numero_bits  = 10;
+
+<span class="comment">% Rango din&aacute;mico del conversor para la atenuaci&oacute;n en la banda de rechazo</span>
+RD = 6.02*numero_bits + 1.76 ; <span class="comment">% en DB</span>
+
+<span class="comment">% Esto es la oscilacion que tiene el Chebyshev en la banda de paso</span>
+Rp = 3; <span class="comment">% en Decibeles</span>
+
+<span class="comment">% te da ceros, polos y ganancia;</span>
+n = 4;
+<span class="comment">% z ceros, p polos y k ganancia</span>
+[z,p,k] = cheb1ap(n,Rp);
+</pre><h2 id="3">.................... PARAMETROS DEL FILTRO CHEVYSHEV ...................</h2><pre class="codeinput">w1 = 2*pi*1000; <span class="comment">% Frecuencia de corte inferior [rad/s]</span>
+w2 = 2*pi*3000; <span class="comment">% Frecuencia de corte superior [rad/s]</span>
+B = w2-w1; <span class="comment">% Ancho de banda de paso [rad/s]</span>
+
+w0 = sqrt(w1*w2); <span class="comment">% Frecuencia central de desnormalizacion de Pasabanda</span>
+</pre><h2 id="4">Funcion de transferencia en s normalizada de Chevyshev</h2><pre class="codeinput">[Num,Den] = zp2tf(z,p,k);
+
+<span class="comment">% tomamos a s como funcion de transferencia</span>
+s = tf(<span class="string">'s'</span>);
+
+<span class="comment">% Desnormalizacion de la funcion de transferencia a Pasabanda</span>
+s = (s^2+w0^2)/(B*s);
+
+D_desn=0;
+N_desn=0;
+
+<span class="comment">% Armado de la funcion de transferencia desnormalizada con los polos y</span>
+<span class="comment">% ceros</span>
+
+<span class="keyword">for</span> i=1:length(Den)
+ D_desn=D_desn+Den(i)*(s^(n+1-i));
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i=1:length(Num)
+ N_desn=N_desn+Num(i)*(s^(n+1-i));
+<span class="keyword">end</span>
+
+Hs_desn = minreal(N_desn/D_desn)
+</pre><pre class="codeoutput">
+Hs_desn =
+ 
+                                            
+                                3.125e15 s^4
+                                            
+  -------------------------------------------------------------------------
+                                                                           
+  s^8 + 7308 s^7 + 6.584e08 s^6 + 3.4e12 s^5 + 1.323e17 s^4 + 4.027e20 s^3 
+                                                                           
+                                    + 9.235e24 s^2 + 1.214e28 s + 1.968e32 
+                                                                           
+ 
+Continuous-time transfer function.
+
+</pre><h2 id="5">..................... Visualizacion de Polos ..........................</h2><pre class="codeinput">close <span class="string">all</span>;
+[P_desn,Z_desn]= pzmap(Hs_desn);
+P_desn
+<span class="comment">% Se seleccionaros los polos 1y2, y 5y6</span>
+
+<span class="comment">% Polinomio de orden 2 con polos 1 y 2 con ganancia 1</span>
+P1 = poly(P_desn(1:2));
+P1 = P1/P1(3);
+L_Pass1 = tf(1,P1);
+
+<span class="comment">% Polinomio de orden 2 con polos 5 y 6 con ganancia 1</span>
+P2 = poly(P_desn(5:6));
+P2 = P2/P2(3);
+L_Pass2=tf(1,P2);
+
+L_Passtotal = L_Pass1*L_Pass2;
+</pre><pre class="codeoutput">
+P_desn =
+
+   1.0e+04 *
+
+  -0.0792 + 1.8340i
+  -0.0792 - 1.8340i
+  -0.1579 + 1.3550i
+  -0.1579 - 1.3550i
+  -0.1005 + 0.8623i
+  -0.1005 - 0.8623i
+  -0.0278 + 0.6446i
+  -0.0278 - 0.6446i
+
+</pre><h2 id="6">....................... Dise&ntilde;o del Pasabajos ...........................</h2><pre class="codeinput"><span class="comment">% ---- Coeficientes del Polinomio del Denominador de Sallen-Key con</span>
+<span class="comment">% ---- ganancia unitaria</span>
+<span class="comment">%%%% Seccion 1</span>
+a2 = P1(1);
+a1 = P1(2);
+a0 = P1(3);
+
+L_Pass1
+
+<span class="comment">%%%% Seccion 2</span>
+b2 = P2(1);
+b1 = P2(2);
+b0 = P2(3);
+
+L_Pass2
+
+<span class="comment">% Se realizaron las siguientes simplieficaciones. Las secciones de</span>
+<span class="comment">% Pasabajos tendran ganancia unitaria, y se llevara el resto de la ganancia</span>
+<span class="comment">% al pasa altos digital. Tomamos a las resistencias como multiplos, como</span>
+<span class="comment">% tambien los capacitores.</span>
+
+<span class="comment">% Celda 1</span>
+
+C_1 = 1*10^(-11);
+
+m_1 = 2;
+
+R_1 = a1/((m_1+1)*C_1); <span class="comment">%Da 150K</span>
+
+R2_1= m_1*R_1; <span class="comment">%Da 300K</span>
+
+n_1 = a2/(m_1*R_1*R_1*C_1*C_1);
+
+C2_1 = C_1*n_1; <span class="comment">%Nos da 6044p, tomamos 5600p</span>
+
+<span class="comment">% Celda 2</span>
+
+C_2 = 1*10^(-9);
+
+m_2 = 2;
+
+R_2 = b1/((m_2+1)*C_2);  <span class="comment">% Tomamos 9.1K</span>
+
+R2_2 = m_2 * R_2; <span class="comment">%Daria 18.2 K, tomamos 18K</span>
+
+n_2 = b2/(m_2*R_2*R_2*C_2*C_2);
+
+C2_2 = C_2*n_2; <span class="comment">%Tomamos 82n</span>
+</pre><pre class="codeoutput">
+L_Pass1 =
+ 
+                1
+  -----------------------------
+  2.968e-09 s^2 + 4.7e-06 s + 1
+ 
+Continuous-time transfer function.
+
+
+L_Pass2 =
+ 
+                 1
+  -------------------------------
+  1.327e-08 s^2 + 2.666e-05 s + 1
+ 
+Continuous-time transfer function.
+
+</pre><h2 id="7">........................... Graficacion ................................</h2><pre class="codeinput"><span class="comment">% ---------------------- Graficacion Bode PasaBanda ----------------------</span>
+close <span class="string">all</span>;
+figure(<span class="string">'Color'</span>,[1 1 1],<span class="string">'Name'</span>,<span class="string">'Bode H(jw) desnormalizada'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+
+N = 2000;
+W = logspace(2,6,N);
+Respuesta_Freq_PasaBanda = freqs(Hs_desn.Numerator{1},Hs_desn.Denominator{1},W);
+Magnitud_Pasabanda = 20*log10(abs(Respuesta_Freq_PasaBanda));
+freq = W/(2*pi);
+
+semilogx(freq,Magnitud_Pasabanda);grid <span class="string">on</span>;
+title(<span class="string">'H(jw) desnormalizada Pasabanda'</span>)
+xlabel(<span class="string">'Frecuencia f [Hz]'</span>);
+ylabel(<span class="string">'Magnitud H(jw) [dB]'</span>);
+
+<span class="comment">% ------------------------- Graficacion Polos ----------------------------</span>
+
+figure(<span class="string">'Color'</span>,[1 1 1],<span class="string">'Name'</span>,<span class="string">'Polos y Ceros de H(s)'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+pzmap(Hs_desn)
+title(<span class="string">'Polos y Ceros de H(s)'</span>)
+
+<span class="comment">% ------------ Graficacion Bode Secciones de forma analitica -------------</span>
+figure(<span class="string">'Color'</span>,[1 1 1],<span class="string">'Name'</span>,<span class="string">'H(jw) de Secciones'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+
+<span class="comment">% Primer Seccion</span>
+Respuesta_L_Pass1 = freqs(L_Pass1.Numerator{1},L_Pass1.Denominator{1},W);
+Maginitud_L_Pass1 = 20*log10(abs(Respuesta_L_Pass1));
+
+semilogx(freq,Maginitud_L_Pass1,<span class="string">'r'</span>);grid <span class="string">on</span>; hold <span class="string">on</span>;
+
+<span class="comment">% Segunda Seccion</span>
+Respuesta_L_Pass2 = freqs(L_Pass2.Numerator{1},L_Pass2.Denominator{1},W);
+Magnitud_L_Pass2 = 20*log10(abs(Respuesta_L_Pass2));
+
+semilogx(freq,Magnitud_L_Pass2,<span class="string">'g'</span>);grid <span class="string">on</span>; hold <span class="string">on</span>;
+
+<span class="comment">% Tercera Seccion</span>
+Respuesta_L_Passtotal = freqs(L_Passtotal.Numerator{1},L_Passtotal.Denominator{1},W);
+Magnitud_L_Passtotal = 20*log10(abs(Respuesta_L_Passtotal));
+
+semilogx(freq,Magnitud_L_Passtotal,<span class="string">'b'</span>);grid <span class="string">on</span>;
+legend(<span class="string">'PasaBajos 1'</span>,<span class="string">'PasaBajos 2'</span>,<span class="string">'PasaBajos Total'</span>);
+title(<span class="string">'H(jw) de Seccion 1, 2 y total'</span>)
+xlabel(<span class="string">'Frecuencia f [Hz]'</span>);
+ylabel(<span class="string">'Magnitud H(jw) [dB]'</span>);
+
+<span class="comment">% ---------- Graficacion Bode LTSpice y  Pasabajos Analitico -------------</span>
+
+figure(<span class="string">'Color'</span>,[1 1 1],<span class="string">'Name'</span>,<span class="string">'H(jw) de Secciones'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+
+<span class="comment">% LTSpice</span>
+[freqLTSpice,dB] = import_ac_LTSpice(<span class="string">'LTSpice_Cell3.txt'</span>);
+
+<span class="comment">% freq = freq*2*pi;</span>
+semilogx(freqLTSpice,dB,<span class="string">'r'</span>);
+hold <span class="string">on</span>;
+grid <span class="string">on</span>;
+
+<span class="comment">% Pasabajos Analitico</span>
+semilogx(freq,Magnitud_L_Passtotal,<span class="string">'g'</span>);grid <span class="string">on</span>;
+
+legend(<span class="string">'PasaBajos LTSpice'</span>,<span class="string">'PasaBajos analitico'</span>);
+title(<span class="string">'Funci&oacute;n H(jw) Anal&iacute;tica, Simulaci&oacute;n'</span>)
+xlabel(<span class="string">'Frecuencia f [Hz]'</span>);
+ylabel(<span class="string">'Magnitud H(jw) [dB]'</span>);
+
+<span class="comment">% ----- Graficacion Bode LTSpice, Pasabajos Analitico e Implementado -----</span>
+
+figure(<span class="string">'Color'</span>,[1 1 1],<span class="string">'Name'</span>,<span class="string">'H(jw) de Secciones'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+
+<span class="comment">% LTSpice</span>
+[freqLTSpice,dB] = import_ac_LTSpice(<span class="string">'LTSpice_Cell3.txt'</span>);
+
+<span class="comment">% freq = freq*2*pi;</span>
+semilogx(freqLTSpice,dB,<span class="string">'r'</span>);
+hold <span class="string">on</span>;
+grid <span class="string">on</span>;
+
+<span class="comment">% Pasabajos Analitico</span>
+semilogx(freq,Magnitud_L_Passtotal,<span class="string">'g'</span>);grid <span class="string">on</span>;
+
+<span class="comment">% Pasabajos Implementado</span>
+
+load(<span class="string">'Datos_Implementacion.mat'</span>);
+semilogx(Frecuencias_Implementado,GananciadB_Implementado,<span class="string">'b'</span>);grid <span class="string">on</span>;
+
+legend(<span class="string">'PasaBajos LTSpice'</span>,<span class="string">'PasaBajos analitico'</span>, <span class="string">'PasaBajos Implementado'</span>);
+title(<span class="string">'Funci&oacute;n H(jw) Anal&iacute;tica, Simulaci&oacute;n e Implementaci&oacute;n'</span>)
+xlabel(<span class="string">'Frecuencia f [Hz]'</span>);
+ylabel(<span class="string">'Magnitud H(jw) [dB]'</span>);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% ............................ ENSAYO 3 ..................................
+% Autores: Dragan Valeria, Hamnstrom Luis, Rodriguez Ruiz Diaz Hernan
+% SAPS: 1er Cuatrimestre 2019
+% 09-05-19
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+%%
+clear all; close all; clc;
+% Hacemo chevy;
+% El numero de bits de resolucion que tiene el conversor AD
+numero_bits  = 10;
+
+% Rango dinámico del conversor para la atenuación en la banda de rechazo
+RD = 6.02*numero_bits + 1.76 ; % en DB
+
+% Esto es la oscilacion que tiene el Chebyshev en la banda de paso
+Rp = 3; % en Decibeles
+
+% te da ceros, polos y ganancia;
+n = 4;
+% z ceros, p polos y k ganancia
+[z,p,k] = cheb1ap(n,Rp);
+
+
+%% .................... PARAMETROS DEL FILTRO CHEVYSHEV ...................
+
+w1 = 2*pi*1000; % Frecuencia de corte inferior [rad/s]
+w2 = 2*pi*3000; % Frecuencia de corte superior [rad/s]
+B = w2-w1; % Ancho de banda de paso [rad/s]
+
+w0 = sqrt(w1*w2); % Frecuencia central de desnormalizacion de Pasabanda
+
+%%% Funcion de transferencia en s normalizada de Chevyshev
+
+[Num,Den] = zp2tf(z,p,k);
+
+% tomamos a s como funcion de transferencia
+s = tf('s');
+
+% Desnormalizacion de la funcion de transferencia a Pasabanda
+s = (s^2+w0^2)/(B*s);
+
+D_desn=0;
+N_desn=0;
+
+% Armado de la funcion de transferencia desnormalizada con los polos y
+% ceros
+
+for i=1:length(Den)
+ D_desn=D_desn+Den(i)*(s^(n+1-i));
+end
+
+for i=1:length(Num)
+ N_desn=N_desn+Num(i)*(s^(n+1-i));
+end
+
+Hs_desn = minreal(N_desn/D_desn)
+
+
+%% ..................... Visualizacion de Polos ..........................
+close all;
+[P_desn,Z_desn]= pzmap(Hs_desn);
+P_desn
+% Se seleccionaros los polos 1y2, y 5y6
+
+% Polinomio de orden 2 con polos 1 y 2 con ganancia 1
+P1 = poly(P_desn(1:2));
+P1 = P1/P1(3);
+L_Pass1 = tf(1,P1);
+
+% Polinomio de orden 2 con polos 5 y 6 con ganancia 1
+P2 = poly(P_desn(5:6));
+P2 = P2/P2(3);
+L_Pass2=tf(1,P2);
+
+L_Passtotal = L_Pass1*L_Pass2;
+
+%% ....................... Diseño del Pasabajos ...........................
+
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH Coeficientes del Polinomio del Denominador de Sallen-Key con
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH ganancia unitaria
+%%%% Seccion 1 
+a2 = P1(1);
+a1 = P1(2);
+a0 = P1(3);
+
+L_Pass1
+
+%%%% Seccion 2
+b2 = P2(1);
+b1 = P2(2);
+b0 = P2(3);
+
+L_Pass2
+
+% Se realizaron las siguientes simplieficaciones. Las secciones de
+% Pasabajos tendran ganancia unitaria, y se llevara el resto de la ganancia
+% al pasa altos digital. Tomamos a las resistencias como multiplos, como
+% tambien los capacitores.
+
+% Celda 1
+
+C_1 = 1*10^(-11);
+
+m_1 = 2;
+
+R_1 = a1/((m_1+1)*C_1); %Da 150K
+
+R2_1= m_1*R_1; %Da 300K
+
+n_1 = a2/(m_1*R_1*R_1*C_1*C_1);
+
+C2_1 = C_1*n_1; %Nos da 6044p, tomamos 5600p
+
+% Celda 2
+
+C_2 = 1*10^(-9);
+
+m_2 = 2;
+
+R_2 = b1/((m_2+1)*C_2);  % Tomamos 9.1K
+
+R2_2 = m_2 * R_2; %Daria 18.2 K, tomamos 18K
+
+n_2 = b2/(m_2*R_2*R_2*C_2*C_2);
+
+C2_2 = C_2*n_2; %Tomamos 82n
+
+
+
+%% ........................... Graficacion ................................
+
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH Graficacion Bode PasaBanda REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+close all;
+figure('Color',[1 1 1],'Name','Bode H(jw) desnormalizada','NumberTitle','off');
+
+N = 2000;
+W = logspace(2,6,N);
+Respuesta_Freq_PasaBanda = freqs(Hs_desn.Numerator{1},Hs_desn.Denominator{1},W);
+Magnitud_Pasabanda = 20*log10(abs(Respuesta_Freq_PasaBanda));
+freq = W/(2*pi);
+
+semilogx(freq,Magnitud_Pasabanda);grid on;
+title('H(jw) desnormalizada Pasabanda')
+xlabel('Frecuencia f [Hz]');
+ylabel('Magnitud H(jw) [dB]');
+
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH- Graficacion Polos REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+figure('Color',[1 1 1],'Name','Polos y Ceros de H(s)','NumberTitle','off');
+pzmap(Hs_desn)
+title('Polos y Ceros de H(s)')
+
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH Graficacion Bode Secciones de forma analitica REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
+
+% Primer Seccion
+Respuesta_L_Pass1 = freqs(L_Pass1.Numerator{1},L_Pass1.Denominator{1},W);
+Maginitud_L_Pass1 = 20*log10(abs(Respuesta_L_Pass1));
+
+semilogx(freq,Maginitud_L_Pass1,'r');grid on; hold on;
+
+% Segunda Seccion
+Respuesta_L_Pass2 = freqs(L_Pass2.Numerator{1},L_Pass2.Denominator{1},W);
+Magnitud_L_Pass2 = 20*log10(abs(Respuesta_L_Pass2));
+
+semilogx(freq,Magnitud_L_Pass2,'g');grid on; hold on;
+
+% Tercera Seccion
+Respuesta_L_Passtotal = freqs(L_Passtotal.Numerator{1},L_Passtotal.Denominator{1},W);
+Magnitud_L_Passtotal = 20*log10(abs(Respuesta_L_Passtotal));
+
+semilogx(freq,Magnitud_L_Passtotal,'b');grid on; 
+legend('PasaBajos 1','PasaBajos 2','PasaBajos Total');
+title('H(jw) de Seccion 1, 2 y total')
+xlabel('Frecuencia f [Hz]');
+ylabel('Magnitud H(jw) [dB]');
+
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH Graficacion Bode LTSpice y  Pasabajos Analitico REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+
+figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
+
+% LTSpice
+[freqLTSpice,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
+
+% freq = freq*2*pi;
+semilogx(freqLTSpice,dB,'r');
+hold on;
+grid on;
+
+% Pasabajos Analitico
+semilogx(freq,Magnitud_L_Passtotal,'g');grid on;
+
+legend('PasaBajos LTSpice','PasaBajos analitico');
+title('Función H(jw) Analítica, Simulación')
+xlabel('Frecuencia f [Hz]');
+ylabel('Magnitud H(jw) [dB]');
+
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH- Graficacion Bode LTSpice, Pasabajos Analitico e Implementado REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+
+figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
+
+% LTSpice
+[freqLTSpice,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
+
+% freq = freq*2*pi;
+semilogx(freqLTSpice,dB,'r');
+hold on;
+grid on;
+
+% Pasabajos Analitico
+semilogx(freq,Magnitud_L_Passtotal,'g');grid on;
+
+% Pasabajos Implementado
+
+load('Datos_Implementacion.mat');
+semilogx(Frecuencias_Implementado,GananciadB_Implementado,'b');grid on;
+
+legend('PasaBajos LTSpice','PasaBajos analitico', 'PasaBajos Implementado');
+title('Función H(jw) Analítica, Simulación e Implementación')
+xlabel('Frecuencia f [Hz]');
+ylabel('Magnitud H(jw) [dB]');
+
+
+
+##### SOURCE END #####
+--></body></html>
