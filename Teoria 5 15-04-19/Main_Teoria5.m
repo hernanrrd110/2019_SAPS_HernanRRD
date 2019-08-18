@@ -70,7 +70,7 @@ ylabel('Modulo','FontSize',11,'FontName','Arial')
 
 xlim([0 3000]);
 
-sound(Senial,frec_muestreo);
+% sound(Senial,frec_muestreo);
 
 
 
