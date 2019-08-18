@@ -6,33 +6,72 @@
 
 %%
 clear all; close all; clc;
-% Hacemo chevy;
+
+w1 = 2*pi*1300; % Frecuencia de corte inferior [rad/s]
+w2 = 2*pi*2500; % Frecuencia de corte superior [rad/s]
+B = w2-w1; % Ancho de banda de paso [rad/s]
+
+w0 = sqrt(w1*w2); % Frecuencia central de desnormalizacion de Pasabanda
+w_8000 = 2*pi*8000;
+w_Normalizado_8000 = (w_8000^2-w0^2)/(B*w_8000);
+
 % El numero de bits de resolucion que tiene el conversor AD
 numero_bits  = 10;
 
 % Rango dinámico del conversor para la atenuación en la banda de rechazo
-RD = 6.02*numero_bits + 1.76 ; % en DB
+RD = -6.02*numero_bits - 1.76 ; % en DB
 
-% Esto es la oscilacion que tiene el Chebyshev en la banda de paso
-Rp = 3; % en Decibeles
-
-% te da ceros, polos y ganancia;
-n = 4;
-% z ceros, p polos y k ganancia
-[z,p,k] = cheb1ap(n,Rp);
+% orden del filtro, inicializado en 0 (de esta manera dentro de ciclo 
+% while se comienza evaluando desde orden 1)
+n = 0;
 
 
-%% .................... PARAMETROS DEL FILTRO CHEVYSHEV ...................
+% genero un vector de frecuencias para la graficación
+w = linspace(0.1,10,1000); 
 
-w1 = 2*pi*1000; % Frecuencia de corte inferior [rad/s]
-w2 = 2*pi*3000; % Frecuencia de corte superior [rad/s]
-B = w2-w1; % Ancho de banda de paso [rad/s]
+figure(1)
+At_Actual = 0;
 
-w0 = sqrt(w1*w2); % Frecuencia central de desnormalizacion de Pasabanda
+% repito el ciclo aumentando el orden hasta que se cumpla con el requisito 
+% de atenuación 
+while (At_Actual > RD)
+    
+    % pruebo con el orden siguiente
+    n = n+1; 
+    
+    % obtengo polos, ceros y ganancia del filtro pasa bajos normalizado de 
+    % orden n
+    [z,p,k]=buttap(n); 
+    
+    % obtengo numerador y denominador de la funcion de transferencia del 
+    % filtro normalizado de orden n
+    [Num,Den] = zp2tf(z,p,k); 
+    
+    h = 20*log10(abs(freqs(Num,Den, [0 w_Normalizado_8000])));
+    At_Actual = h(2); 
+    
+    % Con fines demostrativos, graficamos la respuesta de los filtros de 
+    % distinto orden
+    
+    % respuesta en magnitud del filtro de orden n
+    mag_n = 20 * log10 (abs(freqs(Num,Den,w)));
+    %%% Funcion de transferencia en s normalizada de Chevyshev
+    
+    semilogx(w,mag_n);
+    hold on
+    
+end
 
-%%% Funcion de transferencia en s normalizada de Chevyshev
+% graficamos tb el requisito de atenuación a cumplir
+semilogx(w_Normalizado_8000,RD,'*');
+title('Filtro Pasabajo Chebyshev Normalizado');
+ylabel('|H(w)|^2 [dB]');
+xlabel('Frecuencia (rad/s)');
 
-[Num,Den] = zp2tf(z,p,k);
+grid on
+hold off
+
+%% .................. PARAMETROS DEL FILTRO BUTTERWORTH ...................
 
 % tomamos a s como funcion de transferencia
 s = tf('s');
@@ -203,7 +242,6 @@ figure('Color',[1 1 1],'Name','H(jw) de Secciones','NumberTitle','off');
 % LTSpice
 [freqLTSpice,dB] = import_ac_LTSpice('LTSpice_Cell3.txt');
 
-% freq = freq*2*pi;
 semilogx(freqLTSpice,dB,'r');
 hold on;
 grid on;
